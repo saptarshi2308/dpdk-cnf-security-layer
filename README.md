@@ -16,7 +16,7 @@ The **CNF Security Layer** is a hardened seccomp-based runtime security mechanis
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/yourusername/dpdk-cnf-security-layer.git
+git clone https://github.com/saptarshi2308/dpdk-cnf-security-layer.git
 cd dpdk-cnf-security-layer
 ```
 
@@ -37,6 +37,172 @@ bash test_security_layer.sh
 ```
 
 ### View Audit Logs
+```bash
+tail -n 200 /tmp/dpdk_security_audit.json
+```
+
+## What You Get When You Clone
+
+### ✅ Included in This Repository
+
+**Security Layer Implementation (4 files)**
+- `cnf_security_layer.h` — Public API declarations
+- `cnf_security_layer.c` — Production-ready implementation with async-safe handler
+- `main.c` — DPDK l3fwd example integrated with security layer
+- `Makefile` — Build configuration with libseccomp linking
+
+**DPDK L3FWD Example Application (25+ files)**
+- `l3fwd_*.c/h` — All forwarding logic and helpers
+- `em_*.cfg`, `lpm_*.cfg` — Configuration files
+- `*_route_parse.c` — Route parsing utilities
+
+**Comprehensive Test Suite (3 files)**
+- `test_seccmp_graceful.c` — Graceful shutdown test with forked harness
+- `test_seccmp_trap.c` — Violation catching demonstration
+- `test_security_layer.sh` — Automated test suite (all features)
+
+**Complete Documentation (7 files)**
+- `README.md` — This file (quick start & overview)
+- `SECURITY_LAYER_README.md` — Technical reference & architecture
+- `IMPLEMENTATION_COMPLETE.md` — Full implementation details
+- `GITHUB_SETUP.md` — GitHub publishing guide
+- `GITHUB_DEPLOYMENT_READY.md` — Deployment checklist
+- `FINAL_SUMMARY.md` — Complete project summary
+- `QUICK_START.sh` — Formatted quick reference
+
+**Configuration & Build**
+- `.gitignore` — Git ignore patterns
+- `meson.build` — Meson build configuration
+
+**Total:** 48 files, ~11,838 lines of code, ~500 KB
+
+### ❌ NOT Included in This Repository
+
+- Full DPDK package (lib/, drivers/, examples/, doc/, etc.)
+- DPDK build artifacts
+- DPDK system libraries
+- External dependencies (hwloc, SPDK, etc.)
+
+**You need to install DPDK separately on your system.**
+
+## Dependencies & Setup
+
+### Prerequisites
+
+This repository requires an **installed DPDK environment**. You have three options:
+
+#### Option 1: Install DPDK from Package Manager (Recommended for Quick Start)
+```bash
+# Ubuntu/Debian
+sudo apt-get install dpdk libdpdk-dev libseccomp-dev
+
+# Then clone and build
+git clone https://github.com/saptarshi2308/dpdk-cnf-security-layer.git
+cd dpdk-cnf-security-layer
+make -j2
+```
+
+#### Option 2: Build DPDK from Source (Recommended for Production)
+```bash
+# Clone DPDK repository
+git clone https://github.com/DPDK/dpdk.git
+cd dpdk
+
+# Build and install
+meson build
+ninja -C build
+sudo ninja -C build install
+
+# Install libseccomp
+sudo apt-get install libseccomp-dev
+
+# Then clone and build security layer
+git clone https://github.com/saptarshi2308/dpdk-cnf-security-layer.git
+cd dpdk-cnf-security-layer
+make -j2
+```
+
+#### Option 3: Use DPDK Installed in Custom Location
+```bash
+# Set PKG_CONFIG_PATH to point to your DPDK installation
+export PKG_CONFIG_PATH=/path/to/dpdk/lib/pkgconfig:$PKG_CONFIG_PATH
+
+git clone https://github.com/saptarshi2308/dpdk-cnf-security-layer.git
+cd dpdk-cnf-security-layer
+make -j2
+```
+
+### Required System Packages
+
+| Package | Purpose | Ubuntu/Debian | CentOS/RHEL |
+|---------|---------|---------------|------------|
+| DPDK 23.11+ | Data Plane Development Kit | `dpdk libdpdk-dev` | `dpdk dpdk-devel` |
+| libseccomp | Seccomp syscall filtering | `libseccomp-dev` | `libseccomp-devel` |
+| GCC | C compiler | `build-essential` | `gcc` |
+| Make | Build system | `make` | `make` |
+| Pkg-config | Dependency resolution | `pkg-config` | `pkgconfig` |
+
+### Build Verification
+
+After cloning and building:
+
+```bash
+# Verify build
+make -j2
+# Expected: clean build with zero warnings
+
+# Run tests
+bash test_security_layer.sh
+# Expected: ✓ All critical tests PASSED
+
+# Check audit log
+tail /tmp/dpdk_security_audit.json
+# Expected: JSON entries with timestamps
+```
+
+## Using This Security Layer in Your Own DPDK Application
+
+If you have an **existing DPDK application**, you can integrate the security layer:
+
+### Step 1: Copy Security Layer Files
+```bash
+cp cnf_security_layer.c /path/to/your/dpdk/app/
+cp cnf_security_layer.h /path/to/your/dpdk/app/
+```
+
+### Step 2: Update Your Makefile
+```makefile
+# Add to your Makefile
+SRCS-y += cnf_security_layer.c
+LDFLAGS += -lseccomp
+```
+
+### Step 3: Integrate into Your Code
+```c
+#include "cnf_security_layer.h"
+
+int main(int argc, char **argv) {
+    // Initialize DPDK
+    rte_eal_init(argc, argv);
+    
+    // Apply security layer early
+    apply_cnf_security_layer();
+    
+    // ... your DPDK processing loop ...
+    
+    // Check for violations
+    if (cnf_security_violation_detected()) {
+        printf("[SECURITY] Violation detected. Initiating shutdown.\n");
+        force_quit = true;  // Trigger graceful shutdown
+    }
+    
+    // Cleanup
+    close_cnf_security_layer();
+    return 0;
+}
+```
+
+## View Audit Logs
 ```bash
 tail -n 200 /tmp/dpdk_security_audit.json
 ```
