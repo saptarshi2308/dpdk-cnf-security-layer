@@ -38,7 +38,7 @@ static void write_audit_log(const char* event_type, const char* details) {
                        "{\"timestamp\": %ld.%09ld, \"event\": \"%s\", \"details\": \"%s\"}\n",
                        (long)ts.tv_sec, (long)ts.tv_nsec, event_type, details);
     if (len <= 0) return;
-
+// THIS IS A LOW LEVEL CALL FOR THE MEMORY ADDRESS
     if (audit_fd >= 0) {
         ssize_t w = write(audit_fd, buffer, (size_t)len);
         (void)w;
