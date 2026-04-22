@@ -37,7 +37,6 @@ $(error "Cannot generate statically-linked binaries with this version of pkg-con
 endif
 endif
 
-CFLAGS += -I../common
 LDFLAGS += -lseccomp
 
 build/$(APP)-shared: $(SRCS-y) Makefile $(PC_FILE) | build
@@ -49,7 +48,41 @@ build/$(APP)-static: $(SRCS-y) Makefile $(PC_FILE) | build
 build:
 	@mkdir -p $@
 
+# ============================================================================
+# Standalone targets (no DPDK required)
+# ============================================================================
+
+# Latency benchmark (standalone — no DPDK dependency)
+.PHONY: benchmark
+benchmark: latency_benchmark
+
+latency_benchmark: latency_benchmark.c cnf_security_layer.c cnf_security_layer.h
+	$(CC) -O3 -Wall -Wextra -o $@ latency_benchmark.c cnf_security_layer.c -lseccomp -lm
+
+# Security tests (standalone — no DPDK dependency)
+.PHONY: tests
+tests: test_seccmp_graceful test_seccmp_trap
+
+test_seccmp_graceful: test_seccmp_graceful.c cnf_security_layer.c cnf_security_layer.h
+	$(CC) -O3 -Wall -Wextra -o $@ test_seccmp_graceful.c cnf_security_layer.c -lseccomp
+
+test_seccmp_trap: test_seccmp_trap.c cnf_security_layer.c cnf_security_layer.h
+	$(CC) -O3 -Wall -Wextra -o $@ test_seccmp_trap.c cnf_security_layer.c -lseccomp
+
+# Build everything that can be built without DPDK
+.PHONY: standalone
+standalone: benchmark tests
+	@echo ""
+	@echo "========================================="
+	@echo " Standalone builds complete:"
+	@echo "   ./latency_benchmark [N] [output.csv]"
+	@echo "   ./test_seccmp_graceful"
+	@echo "   ./test_seccmp_trap"
+	@echo "========================================="
+
 .PHONY: clean
 clean:
 	rm -f build/$(APP) build/$(APP)-static build/$(APP)-shared
+	rm -f latency_benchmark test_seccmp_graceful test_seccmp_trap
+	rm -f latency_results.csv
 	test -d build && rmdir -p build || true
