@@ -110,10 +110,17 @@ echo ""
 # Test 6: l3fwd binary (only if DPDK is installed)
 echo "[TEST 6] l3fwd Binary (requires DPDK)"
 echo "--------"
+L3FWD_BIN=""
 if [ -x "$REPO_DIR/build/l3fwd" ]; then
+    L3FWD_BIN="$REPO_DIR/build/l3fwd"
+elif [ -x "$REPO_DIR/../../build/examples/dpdk-l3fwd" ]; then
+    L3FWD_BIN="$REPO_DIR/../../build/examples/dpdk-l3fwd"
+fi
+
+if [ -n "$L3FWD_BIN" ]; then
     echo "✓ l3fwd binary exists and is executable"
-    echo "  Location: $REPO_DIR/build/l3fwd"
-    echo "  Size: $(stat -c%s "$REPO_DIR/build/l3fwd" 2>/dev/null || echo 'unknown') bytes"
+    echo "  Location: $L3FWD_BIN"
+    echo "  Size: $(stat -c%s "$L3FWD_BIN" 2>/dev/null || echo 'unknown') bytes"
     PASS=$((PASS + 1))
 else
     echo "⚠ SKIPPED: l3fwd not built (DPDK not installed or not compiled)"

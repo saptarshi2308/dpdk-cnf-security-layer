@@ -17,6 +17,7 @@ sources = files(
         'l3fwd_event_generic.c',
         'l3fwd_fib.c',
         'l3fwd_lpm.c',
+        'cnf_security_layer.c',
         'main.c',
 )
 if dpdk_conf.has('RTE_LIB_EVENTDEV')
