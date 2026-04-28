@@ -1,7 +1,7 @@
 #!/bin/bash
 # merge_into_dpdk.sh — Copy security layer files into the DPDK 23.11 l3fwd tree
 
-SRC="/mnt/c/Users/User/.gemini/antigravity/scratch/dpdk-cnf-security-layer"
+SRC="$(cd "$(dirname "$0")" && pwd)"
 DST="/home/Saptarshi_1996/dpdk-23.11/examples/l3fwd"
 
 echo "=============================================="
