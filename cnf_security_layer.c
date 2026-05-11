@@ -194,7 +194,7 @@ int apply_cnf_security_layer(void) {
     ADD_ALLOW(epoll_ctl);
 
 #undef ADD_ALLOW
-
+/* this is the privelege dropping section */
     write_audit_log("INFO", "Seccomp rules prepared, loading into kernel");
 
     int rc = seccomp_load(ctx);
